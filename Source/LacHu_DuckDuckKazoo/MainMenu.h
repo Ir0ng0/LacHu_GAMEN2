@@ -13,7 +13,7 @@
 UCLASS()
 class LACHU_DUCKDUCKKAZOO_API UMainMenu : public UUserWidget
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 protected:
     virtual bool Initialize();
@@ -27,16 +27,19 @@ private:
     class UButton* JoinButton;
 
     UPROPERTY(meta = (BindWidget))
-    class UWidgetSwitcher* Screens;
+    class UWidgetSwitcher* Switcher;
 
     UPROPERTY(meta = (BindWidget))
-    class UWidget* Menu;
+    class UWidget* MainMenu;
 
     UPROPERTY(meta = (BindWidget))
-    class UWidget* JoinScreen;
+    class UWidget* HostJoinMenu;
 
     UPROPERTY(meta = (BindWidget))
-    class UEditableTextBox* InputIP;
+    class UWidget* JoinMenu;
+
+    UPROPERTY(meta = (BindWidget))
+    class UEditableTextBox* IPInput;
 
     UPROPERTY(meta = (BindWidget))
     class UButton* JoinConfirm;
@@ -56,6 +59,7 @@ private:
     UFUNCTION()
     void CancelJoin();
 
+private:
     UMyGameInstance* MenuGameInstance;
 
 public:

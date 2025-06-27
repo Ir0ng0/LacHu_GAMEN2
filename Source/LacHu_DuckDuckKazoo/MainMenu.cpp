@@ -40,8 +40,8 @@ void UMainMenu::HostGame() {
 void UMainMenu::OpenJoinScreen() {
     UE_LOG(LogTemp, Warning, TEXT("Join button was clicked."));
 
-    if (Screens && JoinScreen) {
-        Screens->SetActiveWidget(JoinScreen);
+    if (Switcher && JoinMenu) {
+        Switcher->SetActiveWidget(JoinMenu);
         UE_LOG(LogTemp, Log, TEXT("Screen switched."));
     }
     else
@@ -51,12 +51,12 @@ void UMainMenu::OpenJoinScreen() {
 }
 
 void UMainMenu::JoinGame() {
-    if (!InputIP) {
+    if (!IPInput) {
         UE_LOG(LogTemp, Warning, TEXT("Missing InputIP."));
         return;
     }
 
-    FString IPAddress = InputIP->GetText().ToString();
+    FString IPAddress = IPInput->GetText().ToString();
 
     if (IPAddress.IsEmpty()) {
         UE_LOG(LogTemp, Warning, TEXT("IP Address input is empty."));
@@ -68,8 +68,8 @@ void UMainMenu::JoinGame() {
 }
 
 void UMainMenu::CancelJoin() {
-    if (Screens && Menu) {
-        Screens->SetActiveWidget(Menu);
+    if (Switcher && MainMenu) {
+        Switcher->SetActiveWidget(MainMenu);
         UE_LOG(LogTemp, Log, TEXT("Cancelled join screen; switched back to menu."));
     }
     else {

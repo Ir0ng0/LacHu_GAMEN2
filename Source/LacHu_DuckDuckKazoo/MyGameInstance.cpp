@@ -8,10 +8,11 @@
 #include "Blueprint/UserWidget.h"
 #include "MainMenu.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Engine/World.h"
 
 UMyGameInstance::UMyGameInstance() {
     UE_LOG(LogTemp, Warning, TEXT("UMyGameInstance has been called."));
-    ConstructorHelpers::FClassFinder<UUserWidget> MenuBPClass(TEXT("/Game/UI/WBP_MainMenu"));
+    ConstructorHelpers::FClassFinder<UUserWidget> MenuBPClass(TEXT("/Game/LacHu_DuckDuckKazoo/UI/WBP_MainMenu"));
 
     if (MenuBPClass.Succeeded())
     {
@@ -47,64 +48,65 @@ void UMyGameInstance::Init() {
     {
         UE_LOG(LogTemp, Error, TEXT("WidgetClass is null or GetWorld() failed."));
     }
+
 }
 
-    void UMyGameInstance::Host() {
+void UMyGameInstance::Host() {
 
-        if (GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Game hosting starting up."));
+    if (GEngine)
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Game hosting starting up."));
 
-        UWorld* World = GetWorld();
+    UWorld* World = GetWorld();
 
-        if (!ensure(World != nullptr)) { return; };
+    if (!ensure(World != nullptr)) { return; };
 
-        World->ServerTravel("/Game/Map/Game?listen");
+    World->ServerTravel("/Game/LacHu_DuckDuckKazoo/Maps/MainMap?listen");
 
+}
+
+void UMyGameInstance::Join(const FString& IPAddress)
+{
+    if (GEngine)
+        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan,
+            FString::Printf(TEXT("Attempting to join IP: %s"), *IPAddress));
+
+    APlayerController* Controller = GetFirstLocalPlayerController();
+
+    if (!ensure(Controller != nullptr)) return;
+
+    Controller->ClientTravel(*IPAddress, ETravelType::TRAVEL_Absolute);
+}
+
+void UMyGameInstance::MainMenu()
+{
+    UWorld* World = GetWorld();
+    APlayerController* PlayerController = World->GetFirstPlayerController();
+    if (!PlayerController)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to get PlayerController."));
     }
 
-    void UMyGameInstance::Join(const FString & IPAddress)
+    if (WidgetClass && World)
     {
-        if (GEngine)
-            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan,
-                FString::Printf(TEXT("Attempting to join IP: %s"), *IPAddress));
-
-        APlayerController* Controller = GetFirstLocalPlayerController();
-
-        if (!ensure(Controller != nullptr)) return;
-
-        Controller->ClientTravel(*IPAddress, ETravelType::TRAVEL_Absolute);
-    }
-
-    void UMyGameInstance::MainMenu()
-    {
-        UWorld* World = GetWorld();
-        APlayerController* PlayerController = World->GetFirstPlayerController();
-        if (!PlayerController)
+        if (!MainMenuWidget)
         {
-            UE_LOG(LogTemp, Error, TEXT("Failed to get PlayerController."));
+            MainMenuWidget = CreateWidget<UMainMenu>(World, WidgetClass);
         }
 
-        if (WidgetClass && World)
+        if (MainMenuWidget)
         {
-            if (!MainMenuWidget)
-            {
-                MainMenuWidget = CreateWidget<UMainMenu>(World, WidgetClass);
-            }
+            MainMenuWidget->AddToViewport();
+            MainMenuWidget->Setup();
 
-            if (MainMenuWidget)
-            {
-                MainMenuWidget->AddToViewport();
-                MainMenuWidget->Setup();
-
-                UE_LOG(LogTemp, Log, TEXT("Main menu loaded and added to viewport."));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Log, TEXT("Failed to load main menu widget."));
-            }
+            UE_LOG(LogTemp, Log, TEXT("Main menu loaded and added to viewport."));
         }
         else
         {
-            UE_LOG(LogTemp, Log, TEXT("WidgetClass or GetWorld() is null."));
+            UE_LOG(LogTemp, Log, TEXT("Failed to load main menu widget."));
         }
     }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("WidgetClass or GetWorld() is null."));
+    }
+}

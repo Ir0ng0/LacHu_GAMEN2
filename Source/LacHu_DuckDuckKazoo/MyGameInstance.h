@@ -17,6 +17,7 @@ class LACHU_DUCKDUCKKAZOO_API UMyGameInstance : public UGameInstance
 public:
     UMyGameInstance();
 
+    UFUNCTION(Exec, BlueprintCallable)
     virtual void Init() override;
 
     UFUNCTION(Exec)
